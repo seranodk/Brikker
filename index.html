@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07081a">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brikker">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}</style>
 <title>Brikker</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -26,15 +33,15 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);overflo
 #app{height:100%;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
 .hud{display:flex;align-items:center;gap:6px 14px;width:100%;max-width:560px;margin:0 auto;flex-wrap:wrap}
-.stats{display:flex;gap:14px;flex:1;min-width:0}
+.stats{display:flex;gap:11px;flex:1;min-width:0}
 .stat{display:flex;flex-direction:column;line-height:1.05;min-width:0}
 .lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.val{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .val.acc{color:var(--accent)}
 #power{font-size:12px;font-weight:700;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase;min-height:14px}
 .btns{display:flex;gap:6px}
 .ib{appearance:none;border:1px solid color-mix(in srgb,var(--fg) 22%,transparent);background:var(--panel);color:var(--fg);
-  width:38px;height:38px;border-radius:10px;display:grid;place-items:center;cursor:pointer;padding:0}
+  width:36px;height:36px;border-radius:10px;display:grid;place-items:center;cursor:pointer;padding:0}
 .ib svg{width:18px;height:18px}
 .ib[aria-pressed="false"] svg{opacity:.4}
 .ib:focus-visible,.btn:focus-visible,.tcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -81,8 +88,11 @@ h2{font-family:var(--display);font-size:24px;margin:0;font-weight:400;text-wrap:
       <div class="stat"><span class="lbl">Liv</span><span id="lives" class="val">3</span></div>
     </div>
     <div class="btns">
-      <button class="ib" id="btnTheme" aria-label="Skift tema" title="Skift tema">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>
+      <button class="ib" id="btnHome" aria-label="Hovedmenu" title="Hovedmenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>
+      </button>
+      <button class="ib" id="btnFS" aria-label="Fuld skærm" title="Fuld skærm" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
       </button>
       <button class="ib" id="btnSound" aria-label="Lyd til/fra" title="Lyd" aria-pressed="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>
@@ -104,6 +114,7 @@ h2{font-family:var(--display);font-size:24px;margin:0;font-weight:400;text-wrap:
           <p class="sub">Murbryder i arkade-stil. Ryd alle brikker i hver runde.</p>
           <div class="themes" id="themes"></div>
           <button class="btn" id="btnStart">Start spil</button>
+          <p class="sub" id="installHint" hidden>Spil i fuld skærm som en app: åbn spillet i Safari eller Chrome og vælg <b>Føj til hjemmeskærm</b>.</p>
           <p class="help"><b>Mobil:</b> træk hvor som helst for at styre, tryk for at sende kuglen og skyde.<br>
             <b>Tastatur:</b> ← → eller A D, mellemrum sender/skyder, P pause.<br>
             <b>Mus:</b> bevæg for at styre, klik for at sende/skyde.</p>
@@ -112,7 +123,13 @@ h2{font-family:var(--display);font-size:24px;margin:0;font-weight:400;text-wrap:
         <section class="panel" id="pPause" hidden>
           <h2>Pause</h2>
           <div class="themes" id="themes2"></div>
+          <button class="btn ghost" id="btnSound2" type="button">Lyd: til</button>
           <div class="row"><button class="btn ghost" id="btnQuit">Menu</button><button class="btn" id="btnResume">Fortsæt</button></div>
+        </section>
+        <section class="panel" id="pQuit" hidden>
+          <h2>Til hovedmenuen?</h2>
+          <p class="sub">Spillet her afsluttes. Point over rekorden bliver gemt.</p>
+          <div class="row"><button class="btn ghost" id="btnQuitNo">Fortsæt</button><button class="btn" id="btnQuitYes">Hovedmenu</button></div>
         </section>
         <section class="panel" id="pOver" hidden>
           <h2 id="overTitle">Spillet er slut</h2>
@@ -128,13 +145,13 @@ h2{font-family:var(--display);font-size:24px;margin:0;font-weight:400;text-wrap:
 <script>
 (() => {
 'use strict';
-const VERSION = 'Brikker 0.1.0';
+const VERSION = 'Brikker 0.2.0';
 
 /* ---------- Banen (logiske enheder) ---------- */
 const W = 416, H = 600, WALL = 12, TOP = 12;
 const COLS = 13, BW = 30, BH = 14, BX0 = WALL + 1, BY0 = 64;
 const PY = H - 46, PH = 12, PW_N = 64, PW_E = 100, BR = 5;
-const BASE_SPEED = 270, MAX_SPEED = 560;
+const BASE_SPEED = 338, MAX_SPEED = 700;   // 0.2.0: +25 % fart
 const PTS = { w:50, o:60, c:70, g:80, r:90, b:100, m:110, y:120 };
 
 /* ---------- Temaer ---------- */
@@ -471,6 +488,7 @@ function gameOver(){
 }
 function startGame(){
   ensureAudio();
+  if(typeof touchDevice!=='undefined' && touchDevice) enterFS();
   Object.assign(st,{score:0,lives:3,level:0,nextLife:20000,parts:[],shake:0,msg:'',msgT:0});
   loadLevel(0); st.mode='play'; show(null);
 }
@@ -488,7 +506,7 @@ function update(dt){
   if(st.mode!=='play') return;
 
   const P=st.paddle;
-  if(keys.l) targetX-=620*dt; if(keys.r) targetX+=620*dt;
+  if(keys.l) targetX-=760*dt; if(keys.r) targetX+=760*dt;
   P.w+=(P.tw-P.w)*Math.min(1,dt*12);
   const maxX = st.gate ? W-WALL+P.w*.5 : W-WALL-P.w/2;
   targetX=clamp(targetX,WALL+P.w/2,maxX); P.x=targetX;
@@ -629,6 +647,8 @@ function updateHud(){
   setText('lives',String(Math.max(0,st.lives)));
   const pw = st.power ? CAPS[st.power][1] : (st.gate ? 'Warp åben' : '');
   setText('power', pw ? '◆ '+pw : '');
+  const inGame = st.mode!=='menu' && st.mode!=='over';
+  if(hud.ig!==inGame){ hud.ig=inGame; $('btnHome').hidden=!inGame; $('btnPause').hidden=!inGame; }
 }
 
 /* ---------- Loop ---------- */
@@ -641,11 +661,16 @@ function loop(now){
 
 /* ---------- Paneler ---------- */
 function show(id){
-  for(const p of ['pMenu','pPause','pOver']) $(p).hidden = p!==id;
+  for(const p of ['pMenu','pPause','pQuit','pOver']) $(p).hidden = p!==id;
   $('overlay').hidden = !id;
 }
 function pause(){ if(st.mode==='play'){ st.mode='paused'; show('pPause'); } }
 function resume(){ if(st.mode==='paused'){ st.mode='play'; show(null); last=performance.now(); } }
+function askQuit(){
+  if(st.mode==='play'){ st.mode='paused'; }
+  if(st.mode==='paused'){ show('pQuit'); return; }
+  if(st.mode==='dying'||st.mode==='clear'){ toMenu(); }
+}
 function toMenu(){ store.set('brikker.hi',String(hi)); st.mode='menu'; st.level=0; loadLevel(0); show('pMenu'); }
 
 function buildThemeCards(el){
@@ -721,12 +746,42 @@ $('btnMenu').addEventListener('click',toMenu);
 $('btnQuit').addEventListener('click',toMenu);
 $('btnResume').addEventListener('click',resume);
 $('btnPause').addEventListener('click',()=>{ st.mode==='paused'?resume():pause(); });
-$('btnTheme').addEventListener('click',()=>{ applyTheme(THEME_KEYS[(THEME_KEYS.indexOf(themeKey)+1)%THEME_KEYS.length]); });
-$('btnSound').addEventListener('click',()=>{ soundOn=!soundOn; store.set('brikker.sound',soundOn?'1':'0'); $('btnSound').setAttribute('aria-pressed',String(soundOn)); ensureAudio(); });
+$('btnHome').addEventListener('click',askQuit);
+$('btnQuitYes').addEventListener('click',toMenu);
+$('btnQuitNo').addEventListener('click',resume);
+$('btnFS').addEventListener('click',toggleFS);
+
+/* ---------- Fuld skærm / app ---------- */
+const standalone = (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches) || navigator.standalone===true;
+const fsSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+const touchDevice = matchMedia('(pointer: coarse)').matches;
+const isFS = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function enterFS(){
+  if(standalone || !fsSupported || isFS()) return;
+  const el=document.documentElement, req=el.requestFullscreen||el.webkitRequestFullscreen;
+  try{
+    const p=req.call(el,{navigationUI:'hide'});
+    const lock=()=>{ try{ screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait').catch(()=>{}); }catch(e){} };
+    if(p && p.then) p.then(lock).catch(()=>{}); else lock();
+  }catch(e){}
+}
+function toggleFS(){
+  if(isFS()){ try{ (document.exitFullscreen||document.webkitExitFullscreen).call(document); }catch(e){} }
+  else enterFS();
+}
+$('btnFS').hidden = standalone || !fsSupported;
+$('installHint').hidden = standalone || fsSupported || !touchDevice;
+['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>setTimeout(resize,60)));
+if('serviceWorker' in navigator && location.protocol==='https:' && document.querySelector('link[rel="manifest"]')){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+$('btnSound').addEventListener('click',()=>{ soundOn=!soundOn; store.set('brikker.sound',soundOn?'1':'0'); syncSound(); ensureAudio(); });
+$('btnSound2').addEventListener('click',()=>$('btnSound').click());
+function syncSound(){ $('btnSound').setAttribute('aria-pressed',String(soundOn)); $('btnSound2').textContent='Lyd: '+(soundOn?'til':'fra'); }
 
 /* ---------- Start ---------- */
 $('verTag').textContent=VERSION;
-$('btnSound').setAttribute('aria-pressed',String(soundOn));
+syncSound();
 $('capsHelp').innerHTML=Object.entries(CAPS).map(([k,[c,n]])=>`<span><em style="background:${c}">${k}</em>${n}</span>`).join('');
 buildThemeCards($('themes')); buildThemeCards($('themes2'));
 window.addEventListener('resize',resize);
