@@ -13,7 +13,7 @@ Murbryder i arkade-stil, inspireret af gameplay og fysik fra Arkanoid (1986). K�
 - **Mus:** bevæg for at styre, klik for at sende/skyde.
 
 ## Temaer
-Neon · Klassisk · Papir — vælges i menuen eller med tema-knappen under spillet.
+Neon · Klassisk · Papir — vælges i hovedmenuen eller i pausemenuen.
 
 ## Gameplay (som i originalen)
 - Bat'et har 8 faste zoner, der bestemmer kuglens vinkel.
@@ -34,3 +34,7 @@ Navngivning: **Brikker 0.x.x** — større ændring hæver første x, mindre æn
 
 ### Brikker 0.1.0
 - Første version: 8 runder, 7 kapsler, 3 temaer, lyd, rekord gemmes lokalt.
+
+## Filer
+- `index.html` – spillet til GitHub Pages (med app-installation).
+- `game.html` – samme spil i artifakt-udgaven til Claude.
